@@ -5,12 +5,13 @@ import Button from 'react-bootstrap/Button';
 
 import FormElement from "./FormElement.js";
 import UserContext from "../context/user-context";
+import { isUser, isUserVerified } from "../common/function.js";
 
 
 const SignIn = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useContext(UserContext);
+  const [ , setUser] = useContext(UserContext);
   const [error, setError] = useState({})
   
   const signIn = (e) => {
@@ -20,16 +21,29 @@ const SignIn = (props) => {
       password,
     })
       .then((data) => {
+        if(isUser(data) && !isUserVerified(data)){
+          
+          console.log("user email is not verified");
+          
+          //show the verify email form
+          props.setEmail(email);
+          props.showVerify();
+          
+        }else if(isUserVerified(data)){
+          setUser(data);
+        }
+        if(Object.keys(error).length !== 0){setError({});}
+        //clear the form
         setEmail("");
         setPassword("");
-        // console.log("USER: ");
-        // console.log(data);
-        setUser(data);
-        if(Object.keys(error).length !== 0){setError({});}
       })
       .catch((err) => {
         setError(err);
         setUser({});
+        if(err.code === "UserNotConfirmedException"){
+          //User has not confirmed email code.
+          //show confirmation code entry / resend options.
+        }
         console.log("Login Error: "+err.message);
       });
   };
@@ -63,10 +77,7 @@ const SignIn = (props) => {
               placeholder="password"
             />
           </FormElement>
-          
-        
         {error.message != null ? <div>{error.message}</div> : null}
-        {Object.keys(user).length !== 0 && user.attributes.email_verified === true  ? <div>VERIFIED</div> : null}
       </Modal.Body>
       <Modal.Footer>
         Not a user?.. 

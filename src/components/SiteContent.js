@@ -1,20 +1,16 @@
 import React, { useContext } from 'react';
 import Container from 'react-bootstrap/Container';
 import UserContext from "../context/user-context";
-import { isUser, listGroups } from "../common/function";
+import { hasGroups, isUserVerified, listGroups } from "../common/function";
 
 
 const SiteContent = () => {
-  const [user, setUser] = useContext(UserContext);
+  const [user] = useContext(UserContext);
 
-  if(isUser(user)){ 
-      console.log("groups: ");
-      console.log(listGroups(user));
-    }
   return(
       <Container>
-        <div>Hello {isUser(user) ? user.attributes.email : null}</div>    
-        {isUser(user) ? <GroupList groups={listGroups(user)}/> : null}
+        <div>Hello {isUserVerified(user) ? user.attributes.email : null}</div>    
+        {isUserVerified(user) && hasGroups(user)? <GroupList groups={listGroups(user)}/> : null}
       </Container>
   );
 }

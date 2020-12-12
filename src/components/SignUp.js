@@ -16,7 +16,6 @@ const SignUp = (props) => {
       .then((data) => {
         console.log(data);
         setWaitingForCode(true);
-        setPassword("");
       })
       .catch((err) => {
         console.log(err);
@@ -27,9 +26,17 @@ const SignUp = (props) => {
     Auth.confirmSignUp(email, code)
       .then((data) => {
         console.log(data);
-        setWaitingForCode(false);
-        setEmail("");
-        setCode("");
+        if(data === "SUCCESS"){
+          Auth.signIn({
+            username: email,
+            password,
+          });
+          setEmail("");
+          setCode("");
+          props.hide();
+          setWaitingForCode(false);
+        }
+        
       })
       .catch((err) => console.log(err));
   };
@@ -47,8 +54,7 @@ const SignUp = (props) => {
     <Modal show={props.show} onHide={props.hide} animation={false} >
       <Modal.Header closeButton>
       </Modal.Header>
-      
-          
+                
       {!waitingForCode ? 
       (<form>
       <Modal.Body>
@@ -92,10 +98,8 @@ const SignUp = (props) => {
         </FormElement>
       </Modal.Body>    
       <Modal.Footer>
-        <Button type="submit" onClick={confirmSignUp}>
-          Confirm Sign Up
-        </Button>
-        <Button type="button" onClick={resendCode}>Resend code</Button>
+        <Button variant="link" onClick={resendCode}>Resend code</Button>
+        <Button type="submit" onClick={confirmSignUp}>Confirm Sign Up</Button>
       </Modal.Footer>
     </form>)
     }

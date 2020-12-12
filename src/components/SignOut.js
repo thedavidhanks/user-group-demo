@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button';
 import UserContext from "../context/user-context";
 
 const SignOut = (props) => {
-  const [user, setUser] = useContext(UserContext)
+  const [ , setUser] = useContext(UserContext)
   async function signOut() {
     try {
         await Auth.signOut()

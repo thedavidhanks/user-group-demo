@@ -10,12 +10,15 @@ import SignOut from "./components/SignOut";
 import UserContext from "./context/user-context";
 import SiteContent from './components/SiteContent';
 
-import { isUser } from './common/function.js';
+import { isUserVerified } from './common/function.js';
+import VerificationModal from "./components/VerificationModal";
 
 const App = () => {
   const [user, setUser] = useState("");
-  const [showSignUp, setShowSignUp] = useState(false)
-  const [showSignIn, setShowSignIn] = useState(false)
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showVerifiy, setShowVerify] = useState(false);
+  const [email, setEmail] = useState("");  //move email between SignIn & VerificationModal
 
   useEffect(() => {
     Amplify.configure({
@@ -31,7 +34,12 @@ const App = () => {
     e.preventDefault(); 
     if(showSignIn){setShowSignIn(false);}
     setShowSignUp(true);
-    
+  }
+
+  const showVerifyMod = () =>{
+    if(showSignIn){setShowSignIn(false);}
+    if(showSignUp){setShowSignUp(false);}
+    setShowVerify('true');
   }
 
   const hideForms = () =>{
@@ -54,7 +62,7 @@ const App = () => {
                 :
                 null}
                 {//if user is signed in
-                isUser(user) ?
+                isUserVerified(user) ?
                 <SignOut reset={hideForms}/> : 
                 
                 null }
@@ -62,10 +70,11 @@ const App = () => {
             </Row>
           </Container>
           {//If not signed in
-          !isUser(user) ?  
+          !isUserVerified(user) ?  
             <span>
               <SignUp show={showSignUp} hide={hideForms} />
-              <SignIn show={showSignIn} hide={hideForms} signUp={showUpForm} />
+              <SignIn show={showSignIn} hide={hideForms} signUp={showUpForm} showVerify={showVerifyMod} setEmail={setEmail}/>
+              <VerificationModal show={showVerifiy} hide={hideForms} email={email}/>
             </span> : 
             null }
           <SiteContent />
