@@ -27,9 +27,9 @@ const SignIn = (props) => {
           setUser(data);
         }
         if(Object.keys(error).length !== 0){setError({});}
-        //clear the form
-        setEmail("");
-        setPassword("");
+        // //clear the form
+        // setEmail("");
+        // setPassword("");
       })
       .catch((err) => {
         setError(err);

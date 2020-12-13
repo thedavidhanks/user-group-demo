@@ -12,21 +12,19 @@ export const confirmSignUp = (e, email, password, code, cleanup) => {
           });
 
           cleanup();
-        //   setEmail("");
-        //   setCode("");
-        //   props.hide();
-        //   setWaitingForCode(false);
         }
       })
       .catch((err) => console.log(err));
   };
 
-export const resendCode = (email) => {
+export function resendCode(email, setMsg){
     Auth.resendSignUp(email)
       .then(() => {
         console.log("code resent successfully");
+        setMsg("Code sent!");
       })
       .catch((e) => {
         console.log(e);
+        setMsg(e.message);
       });
   };

@@ -10,6 +10,8 @@ const SignUp = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [waitingForCode, setWaitingForCode] = useState(false);
+  const [msg, setMsg] = useState("");
+
   const signUp = (e) => {
     e.preventDefault();
     Auth.signUp({ username: email, password, attributes: { email } })
@@ -19,6 +21,7 @@ const SignUp = (props) => {
       })
       .catch((err) => {
         console.log(err);
+        setMsg(err.message);
       });
   };
 
@@ -54,6 +57,7 @@ const SignUp = (props) => {
             placeholder="password"
           />
         </FormElement>
+        {msg ? msg : null}
       </Modal.Body>
       <Modal.Footer>
         <Button type="submit" onClick={signUp}>

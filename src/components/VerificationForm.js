@@ -11,7 +11,7 @@ import { confirmSignUp, resendCode } from "../common/loginFunctions";
 const VerificationForm = (props) => {
 
     const [code, setCode] = useState("");
-    
+    const [msg, setMsg] = useState("");
     return(
         <form>
         <Modal.Header closeButton>
@@ -27,11 +27,15 @@ const VerificationForm = (props) => {
                 placeholder="code"
             />
             </FormElement>
-            {//TODO add error msg and "code sent msg"
-            }
+            {msg ? <div style={{textAlign: "right"}}>{msg}</div> : null }
         </Modal.Body>    
         <Modal.Footer>
-            <Button variant="link" onClick={(e) => resendCode(props.email)}>Resend code</Button>
+            <Button 
+                variant="link" 
+                onClick={(e) => resendCode(props.email, setMsg)}
+            >
+                Resend code
+            </Button>
             <Button type="submit" onClick={(e) => confirmSignUp(e, props.email, props.password, code, props.cleanup)}>Confirm Sign Up</Button>
         </Modal.Footer>
         </form>
