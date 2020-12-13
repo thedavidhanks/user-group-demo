@@ -4,12 +4,12 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
 import FormElement from "./FormElement.js";
+import VerificationForm from './VerificationForm';
 
 const SignUp = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [waitingForCode, setWaitingForCode] = useState(false);
-  const [code, setCode] = useState("");
   const signUp = (e) => {
     e.preventDefault();
     Auth.signUp({ username: email, password, attributes: { email } })
@@ -21,34 +21,12 @@ const SignUp = (props) => {
         console.log(err);
       });
   };
-  const confirmSignUp = (e) => {
-    e.preventDefault();
-    Auth.confirmSignUp(email, code)
-      .then((data) => {
-        console.log(data);
-        if(data === "SUCCESS"){
-          Auth.signIn({
-            username: email,
-            password,
-          });
-          setEmail("");
-          setCode("");
-          props.hide();
-          setWaitingForCode(false);
-        }
-        
-      })
-      .catch((err) => console.log(err));
-  };
-  const resendCode = () => {
-    Auth.resendSignUp(email)
-      .then(() => {
-        console.log("code resent successfully");
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
+
+  const cleanup = () =>{
+    setEmail("");
+    setWaitingForCode(false);
+    props.hide();
+  }
 
   return (
     <Modal show={props.show} onHide={props.hide} animation={false} >
@@ -85,23 +63,7 @@ const SignUp = (props) => {
       
     </form>)
     :
-    (<form>
-      <Modal.Body>
-        <FormElement label="Confirmation Code" forId="sign-up-code">
-          <input
-            id="sign-up-code"
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="code"
-          />
-        </FormElement>
-      </Modal.Body>    
-      <Modal.Footer>
-        <Button variant="link" onClick={resendCode}>Resend code</Button>
-        <Button type="submit" onClick={confirmSignUp}>Confirm Sign Up</Button>
-      </Modal.Footer>
-    </form>)
+    <VerificationForm email={email} password={password} cleanup={cleanup} />
     }
     </Modal>
   );

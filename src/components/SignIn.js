@@ -4,15 +4,17 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
 import FormElement from "./FormElement.js";
+import VerificationForm from "./VerificationForm.js";
 import UserContext from "../context/user-context";
-import { isUser, isUserVerified } from "../common/function.js";
+import { isUserVerified } from "../common/function.js";
 
 
 const SignIn = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [ , setUser] = useContext(UserContext);
+  const [waitingForCode, setWaitingForCode] = useState(false);
   const [error, setError] = useState({})
+  const [ , setUser] = useContext(UserContext);
   
   const signIn = (e) => {
     e.preventDefault();
@@ -21,15 +23,7 @@ const SignIn = (props) => {
       password,
     })
       .then((data) => {
-        if(isUser(data) && !isUserVerified(data)){
-          
-          console.log("user email is not verified");
-          
-          //show the verify email form
-          props.setEmail(email);
-          props.showVerify();
-          
-        }else if(isUserVerified(data)){
+        if(isUserVerified(data)){
           setUser(data);
         }
         if(Object.keys(error).length !== 0){setError({});}
@@ -41,6 +35,7 @@ const SignIn = (props) => {
         setError(err);
         setUser({});
         if(err.code === "UserNotConfirmedException"){
+          setWaitingForCode(true);
           //User has not confirmed email code.
           //show confirmation code entry / resend options.
         }
@@ -49,16 +44,25 @@ const SignIn = (props) => {
   };
 
   const reset = () => {
+    setWaitingForCode(false);
     setError({});
     props.hide();
   }
+
+  const cleanup = () =>{
+    setEmail("");
+    setPassword("");
+    setWaitingForCode(false);
+    props.hide();
+  }
+
   return (
     <Modal show={props.show} onHide={reset} animation={false}>
-      <form>
+      {!waitingForCode ?
+      (<form>
       <Modal.Header closeButton>
       </Modal.Header>
       <Modal.Body>
-        
         <FormElement label="Email" forId="sign-in-email">
             <input
               id="sign-in-email"
@@ -67,8 +71,8 @@ const SignIn = (props) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email"
             />
-          </FormElement>
-          <FormElement label="Password" forId="sign-in-password">
+        </FormElement>
+        <FormElement label="Password" forId="sign-in-password">
             <input
               id="sign-in-password"
               type="password"
@@ -76,8 +80,9 @@ const SignIn = (props) => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
             />
-          </FormElement>
+        </FormElement>
         {error.message != null ? <div>{error.message}</div> : null}
+
       </Modal.Body>
       <Modal.Footer>
         Not a user?.. 
@@ -86,7 +91,10 @@ const SignIn = (props) => {
           Sign In
         </Button>
       </Modal.Footer>
-      </form>
+      </form>)
+      :
+    <VerificationForm email={email} password={password} cleanup={cleanup} />
+    }
     </Modal>
     
   );

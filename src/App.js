@@ -1,24 +1,19 @@
 import React, {useState, useEffect} from "react";
 import Amplify from "aws-amplify";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
-import SignOut from "./components/SignOut";
 import UserContext from "./context/user-context";
 import SiteContent from './components/SiteContent';
+import Banner from './components/Banner';
 
+import './App.css';
 import { isUserVerified } from './common/function.js';
-import VerificationModal from "./components/VerificationModal";
 
 const App = () => {
   const [user, setUser] = useState("");
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
-  const [showVerifiy, setShowVerify] = useState(false);
-  const [email, setEmail] = useState("");  //move email between SignIn & VerificationModal
+  const [ , setEmail] = useState("");  //move email between SignIn & VerificationModal
 
   useEffect(() => {
     Amplify.configure({
@@ -36,45 +31,19 @@ const App = () => {
     setShowSignUp(true);
   }
 
-  const showVerifyMod = () =>{
-    if(showSignIn){setShowSignIn(false);}
-    if(showSignUp){setShowSignUp(false);}
-    setShowVerify('true');
-  }
-
-  const hideForms = () =>{
+    const hideForms = () =>{
     if(showSignIn){setShowSignIn(false);}
     if(showSignUp){setShowSignUp(false);}
   }
   return (
     <div className="App">
         <UserContext.Provider value={[user,setUser]}>
-          <Container>
-            <Row>
-              <Col ></Col>
-              <Col md={3} sm={4}>
-                {//If not signed in
-                Object.keys(user).length === 0 ?  
-                <span>
-                  <Button onClick={() => setShowSignIn(true)}>Login</Button>
-                  <Button variant="link" onClick={showUpForm}>Sign Up</Button>
-                </span>
-                :
-                null}
-                {//if user is signed in
-                isUserVerified(user) ?
-                <SignOut reset={hideForms}/> : 
-                
-                null }
-              </Col>
-            </Row>
-          </Container>
+          <Banner hideForms={hideForms} showUpForm={showUpForm} setShowSignIn={setShowSignIn}/>
           {//If not signed in
           !isUserVerified(user) ?  
             <span>
-              <SignUp show={showSignUp} hide={hideForms} />
-              <SignIn show={showSignIn} hide={hideForms} signUp={showUpForm} showVerify={showVerifyMod} setEmail={setEmail}/>
-              <VerificationModal show={showVerifiy} hide={hideForms} email={email}/>
+              <SignUp show={showSignUp} hide={hideForms} setShowSignIn={setShowSignIn} />
+              <SignIn show={showSignIn} hide={hideForms} signUp={showUpForm} setEmail={setEmail}/>
             </span> : 
             null }
           <SiteContent />
